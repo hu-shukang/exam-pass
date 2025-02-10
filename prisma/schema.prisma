@@ -1,0 +1,175 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model access_history {
+  id          String    @id @db.Char(15)
+  user_id     String    @db.Char(15)
+  ip_address  String    @db.Char(39)
+  access_time DateTime? @default(now()) @db.DateTime(0)
+
+  @@index([user_id], map: "access_history_user_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model allow_email {
+  id            String    @id @db.Char(15)
+  allow_pattern String    @db.VarChar(200)
+  comment       String    @db.VarChar(200)
+  create_time   DateTime? @default(now()) @db.DateTime(0)
+  update_time   DateTime? @db.DateTime(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model allow_email_init_role {
+  access_email_id String @db.Char(15)
+  role_id         String @db.Char(15)
+
+  @@id([access_email_id, role_id])
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model answer_choice {
+  exam_id        String    @db.Char(15)
+  tag            String    @db.VarChar(2)
+  content        String    @db.Text
+  is_true_answer Boolean
+  create_time    DateTime? @default(now()) @db.DateTime(0)
+  update_time    DateTime? @db.DateTime(0)
+
+  @@id([exam_id, tag])
+  @@index([exam_id], map: "examId")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model exam {
+  id          String    @id @db.Char(15)
+  question    String    @db.Text
+  analysis    String    @db.Text
+  create_time DateTime? @default(now()) @db.DateTime(0)
+  update_time DateTime? @db.DateTime(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model exam_answer_history {
+  exam_set_history_id String    @db.Char(15)
+  exam_id             String    @db.Char(15)
+  answer_tag          String    @db.VarChar(20)
+  create_time         DateTime? @default(now()) @db.DateTime(0)
+  update_time         DateTime? @db.DateTime(0)
+
+  @@id([exam_set_history_id, exam_id])
+  @@index([exam_set_history_id], map: "idx_exam_history_set_id")
+  @@index([exam_id, answer_tag], map: "idx_exam_id_and_answer_tag")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model exam_belong {
+  exam_id     String    @db.Char(15)
+  exam_set_id String    @db.Char(15)
+  create_time DateTime? @default(now()) @db.DateTime(0)
+  update_time DateTime? @db.DateTime(0)
+
+  @@id([exam_id, exam_set_id])
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model exam_category {
+  id            String    @id @db.Char(15)
+  category_name String    @unique(map: "category_name") @db.VarChar(200)
+  icon          String?   @db.VarChar(200)
+  order_key     Int?      @unique(map: "order_key")
+  delete_flg    Int?      @default(0) @db.TinyInt
+  create_time   DateTime? @default(now()) @db.DateTime(0)
+  update_time   DateTime? @db.DateTime(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model exam_set {
+  id            String    @id @db.Char(15)
+  exam_set_name String    @unique(map: "exam_set_name") @db.VarChar(150)
+  category_id   String    @db.Char(15)
+  pass_point    Int
+  duration      Int
+  role_id       String?   @db.Char(15)
+  order_key     Int?      @unique(map: "order_key")
+  visible       Int?      @default(0) @db.TinyInt
+  delete_flg    Int?      @default(0) @db.TinyInt
+  create_time   DateTime? @default(now()) @db.DateTime(0)
+  update_time   DateTime? @db.DateTime(0)
+
+  @@index([category_id], map: "idx_category_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model exam_set_history {
+  id          String    @id @db.Char(15)
+  user_id     String    @db.Char(15)
+  exam_set_id String    @db.Char(15)
+  taken_time  Int?
+  score       String    @db.VarChar(6)
+  delete_flg  Int?      @default(0) @db.TinyInt
+  create_time DateTime? @default(now()) @db.DateTime(0)
+  update_time DateTime? @db.DateTime(0)
+
+  @@index([exam_set_id], map: "idx_exam_set_id")
+  @@index([user_id], map: "idx_user_id")
+  @@index([user_id, exam_set_id], map: "idx_user_id_and_exam_set_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model notify {
+  id          Int       @id @default(autoincrement())
+  title       String    @db.VarChar(100)
+  content     String    @db.Text
+  create_time DateTime? @default(now()) @db.DateTime(0)
+  update_time DateTime? @db.DateTime(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model role {
+  id           String    @id @db.Char(15)
+  parent_id    String    @db.Char(15)
+  role_name    String    @unique(map: "role_name") @db.VarChar(90)
+  display_name String    @db.VarChar(90)
+  kind         String    @default("0") @db.Char(1)
+  create_time  DateTime? @default(now()) @db.DateTime(0)
+  update_time  DateTime? @db.DateTime(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model tbl_sequence {
+  sequence_name String @id @db.VarChar(64)
+  prefix        String @db.Char(2)
+  value         Int
+  date          String @db.Char(8)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model user {
+  id           String    @id @db.Char(15)
+  username     String?   @unique(map: "username") @db.VarChar(50)
+  password     String?   @db.Char(200)
+  email        String    @unique(map: "email") @db.VarChar(200)
+  nickname     String?   @db.VarChar(200)
+  create_time  DateTime? @default(now()) @db.DateTime(0)
+  update_time  DateTime? @db.DateTime(0)
+  icon         String?   @db.VarChar(300)
+  expired_time DateTime? @db.DateTime(0)
+  lock_flg     String?   @default("0") @db.Char(1)
+  disable_flg  String?   @default("0") @db.Char(1)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model user_role {
+  user_id String @db.Char(15)
+  role_id String @db.Char(15)
+
+  @@id([user_id, role_id])
+}

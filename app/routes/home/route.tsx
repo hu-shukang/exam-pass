@@ -1,13 +1,20 @@
-import type { Route } from '../+types/home';
+import type { Route } from './+types/route';
+import { Api } from './api.server';
+import ExamItem from './components/ExamItem';
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: 'New React Router App' }, { name: 'description', content: 'Welcome to React Router!' }];
 }
 
-export function loader({ context }: Route.LoaderArgs) {
-  return { message: context.VALUE_FROM_EXPRESS };
-}
+export const loader = Api.loader;
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-  return <div>hello world</div>;
+  const exams = loaderData.exams;
+  return (
+    <div>
+      {exams.map((exam, index) => (
+        <ExamItem key={exam.id} index={index + 1} item={exam} />
+      ))}
+    </div>
+  );
 }

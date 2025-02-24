@@ -42,6 +42,7 @@ model answer_choice {
   is_true_answer Boolean
   create_time    DateTime? @default(now()) @db.DateTime(0)
   update_time    DateTime? @db.DateTime(0)
+  exam           exam?     @relation(fields: [exam_id], references: [id])
 
   @@id([exam_id, tag])
   @@index([exam_id], map: "examId")
@@ -49,11 +50,13 @@ model answer_choice {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model exam {
-  id          String    @id @db.Char(15)
-  question    String    @db.Text
-  analysis    String    @db.Text
-  create_time DateTime? @default(now()) @db.DateTime(0)
-  update_time DateTime? @db.DateTime(0)
+  id          String          @id @db.Char(15)
+  question    String          @db.Text
+  analysis    String          @db.Text
+  create_time DateTime?       @default(now()) @db.DateTime(0)
+  update_time DateTime?       @db.DateTime(0)
+  belongs     exam_belong[]
+  choices     answer_choice[]
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -75,34 +78,39 @@ model exam_belong {
   exam_set_id String    @db.Char(15)
   create_time DateTime? @default(now()) @db.DateTime(0)
   update_time DateTime? @db.DateTime(0)
+  exam_set    exam_set? @relation(fields: [exam_set_id], references: [id])
+  exam        exam?     @relation(fields: [exam_id], references: [id])
 
   @@id([exam_id, exam_set_id])
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model exam_category {
-  id            String    @id @db.Char(15)
-  category_name String    @unique(map: "category_name") @db.VarChar(200)
-  icon          String?   @db.VarChar(200)
-  order_key     Int?      @unique(map: "order_key")
-  delete_flg    Int?      @default(0) @db.TinyInt
-  create_time   DateTime? @default(now()) @db.DateTime(0)
-  update_time   DateTime? @db.DateTime(0)
+  id            String     @id @db.Char(15)
+  category_name String     @unique(map: "category_name") @db.VarChar(200)
+  icon          String?    @db.VarChar(200)
+  order_key     Int?       @unique(map: "order_key")
+  delete_flg    Int?       @default(0) @db.TinyInt
+  create_time   DateTime?  @default(now()) @db.DateTime(0)
+  update_time   DateTime?  @db.DateTime(0)
+  exam_set      exam_set[]
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model exam_set {
-  id            String    @id @db.Char(15)
-  exam_set_name String    @unique(map: "exam_set_name") @db.VarChar(150)
-  category_id   String    @db.Char(15)
+  id            String        @id @db.Char(15)
+  exam_set_name String        @unique(map: "exam_set_name") @db.VarChar(150)
+  category_id   String        @db.Char(15)
   pass_point    Int
   duration      Int
-  role_id       String?   @db.Char(15)
-  order_key     Int?      @unique(map: "order_key")
-  visible       Int?      @default(0) @db.TinyInt
-  delete_flg    Int?      @default(0) @db.TinyInt
-  create_time   DateTime? @default(now()) @db.DateTime(0)
-  update_time   DateTime? @db.DateTime(0)
+  role_id       String?       @db.Char(15)
+  order_key     Int?          @unique(map: "order_key")
+  visible       Int?          @default(0) @db.TinyInt
+  delete_flg    Int?          @default(0) @db.TinyInt
+  create_time   DateTime?     @default(now()) @db.DateTime(0)
+  update_time   DateTime?     @db.DateTime(0)
+  exam_category exam_category @relation(fields: [category_id], references: [id])
+  belongs       exam_belong[]
 
   @@index([category_id], map: "idx_category_id")
 }

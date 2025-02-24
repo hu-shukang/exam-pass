@@ -3,7 +3,7 @@ import { prisma } from '~/.server/utils';
 
 async function loader({}: Route.LoaderArgs) {
   const exams = await prisma.exam.findMany({
-    where: { belongs: { some: { exam_set_id: 'ES2022010900001' } } },
+    where: { belongs: { some: { exam_set_id: 'ES2022040400001' } } },
     select: {
       id: true,
       question: true,

@@ -11,7 +11,7 @@ export const loader = Api.loader;
 export default function Home({ loaderData }: Route.ComponentProps) {
   const exams = loaderData.exams;
   return (
-    <div>
+    <div className="p-4">
       {exams.map((exam, index) => (
         <ExamItem key={exam.id} index={index + 1} item={exam} />
       ))}
